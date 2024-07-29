@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
-from store.models import Product
+from store.models import Product,Variation
 from .models import Cart, CartItem
+from django.http import HttpResponse
 
 def _cart_id(request):
     cart = request.session.session_key
@@ -11,6 +12,21 @@ def _cart_id(request):
 
 def add_cart(request, product_id):
     product = Product.objects.get(id=product_id)
+    product_variation = []
+    if request.method == 'POST':
+        for item in request.POST:
+            key = item
+            value = request.POST[key]
+            
+            try:
+                variation = Variation.objects.get(product=product,variation_category__iexact=key,
+                                                  variation_value__iexact=value)
+                product_variation.append(variation)
+            except:
+                pass
+    
+
+   
     cart_id = _cart_id(request)
 
     try:
@@ -20,9 +36,14 @@ def add_cart(request, product_id):
         # Create a new Cart if it does not exist
         cart = Cart.objects.create(cart_id=cart_id)
 
+    cart_item = None
     try:
         # Attempt to retrieve the CartItem
         cart_item = CartItem.objects.get(product=product, cart=cart)
+        if len(product_variation) > 0 :
+            cart_item.variations.clear()
+            for item in product_variation:
+                cart_item.variations.add(item)
         cart_item.quantity += 1
         cart_item.save()
     except CartItem.DoesNotExist:
@@ -32,7 +53,11 @@ def add_cart(request, product_id):
             cart=cart,
             quantity=1
         )
-
+        if len(product_variation) > 0 :
+            cart_item.variations.clear()
+            for item in product_variation:
+                cart_item.variations.add(item)
+        cart_item.save()
     return redirect('cart')
 
 def remove_cart(request,product_id):

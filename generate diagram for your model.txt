@@ -1,0 +1,15 @@
+pip install django-extensions
+-----------
+INSTALLED_APPS = [
+    # other apps
+    'django_extensions',
+]
+----------
+apt-get install graphviz
+-----------
+For Windows: Download and install Graphviz from Graphviz's website. 
+Ensure that the Graphviz bin directory (e.g., C:\Program Files\Graphviz\bin) is added to your system's PATH.
+-----------
+python manage.py graph_models -a -o myapp_models.png
+-a: This option includes all apps in the diagram. You can also specify specific apps by replacing -a with the app names (e.g., myapp1,myapp2).
+-o myapp_models.png: This option specifies the output file name and format (e.g., PNG). You can choose other formats like PDF or SVG if you prefer.
