@@ -8,6 +8,12 @@ class AccountAdmin(UserAdmin):
     ordering = ('-date_joined',)
     list_filter = ()
     fieldsets = ()
+    add_fieldsets = (
+        ('User Registeration', {
+            'classes': ('wide',),
+            'fields': ('phone_number', 'email', 'username', 'password1', 'password2')}
+        ),
+    )
     filter_horizontal = ()
     
 admin.site.register(Account, AccountAdmin)
