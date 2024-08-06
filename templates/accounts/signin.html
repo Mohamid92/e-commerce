@@ -3,6 +3,15 @@
 
 {% block content %}
 <!-- ========================= SECTION CONTENT ========================= -->
+{% if request.GET.command == 'successful' %}
+<div class="container mx-auto" style="max-width: 1024px; margin-top:100px;">
+    {% include 'includes/alerts.html' %}
+    <div class="d-flex justify-content-center">
+        <a href="#" class="btn btn-primary text-white my-5" style="width: 50%;">Log In</a>
+    </div>
+
+</div>
+{% else %}
 <section class="section-conten padding-y" style="min-height:84vh">
 
 <!-- ============================ COMPONENT LOGIN   ================================= -->
@@ -37,5 +46,5 @@
 
 </section>
 <!-- ========================= SECTION CONTENT END// ========================= -->
-
+{%endif%}
 {%endblock%}

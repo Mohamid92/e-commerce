@@ -1,0 +1,12 @@
+{% comment %} used just to make sure email is safe {% endcomment %}
+ {% autoescape off %}
+
+Hi {{user.first_name}},
+
+Please Click on below link to confirm your registeration.
+http://{{ domain }}{% url 'activate' uidb64=uid token=token %}
+
+if you think it's not you, please ignore this email.
+
+
+{% endautoescape %}

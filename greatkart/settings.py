@@ -143,3 +143,16 @@ MESSAGE_TAGS = {
     messages.ERROR: "danger",
  
 }
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+
+#SMTP CONFIGRATION
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smpt.mail.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'engineerto@mail.com'
+# EMAIL_HOST_PASSWORD = 'master909'
