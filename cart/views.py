@@ -2,11 +2,12 @@ from django.shortcuts import render, redirect
 from store.models import Product,Variation
 from .models import Cart, CartItem
 from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
 
 def _cart_id(request):
     cart = request.session.session_key
     if not cart:
-        request.session.create()  # Use request.session.save() to ensure session creation        
+        request.session.save()  # Ensure session is created
         cart = request.session.session_key
     return cart
 
@@ -105,6 +106,35 @@ def remove_cart(request,product_id,cart_item_id):
   
 
 def cart(request,total=0,quantity=0,cart_items=None):
+    cart_id =_cart_id(request)
+    print(f'start of cart function :::  {cart_id}')
+
+    try:
+        cart = Cart.objects.get(cart_id=cart_id)
+        cartitems = CartItem.objects.filter(cart=cart,is_active=True)
+        print(f'finding cart items :::  {cartitems}')
+        for items in cartitems:
+            total += (items.product.price * items.quantity)
+            quantity += items.quantity
+        tax = ( 2* total)/100
+        grand_total = tax + total
+        
+        context = {
+            'total' : total,
+            'quantity' : quantity,
+            'cart_items' : cartitems,
+            'tax':tax,
+            'grand_total':grand_total
+        }
+    except Cart.DoesNotExist:
+        cartitems = []  # or handle the case where the cart does not exist
+
+    context = {'cart_items' : cartitems}
+    return render(request, 'cart/cart.html',context)
+
+
+@login_required(login_url='signin')
+def checkout(request,total=0,quantity=0,cart_items=None):
     cart = Cart.objects.get(cart_id=_cart_id(request))
     cartitems = CartItem.objects.filter(cart=cart,is_active=True)
     for items in cartitems:
@@ -120,4 +150,4 @@ def cart(request,total=0,quantity=0,cart_items=None):
         'tax':tax,
         'grand_total':grand_total
     }
-    return render(request, 'cart/cart.html',context)
+    return render(request,'cart/checkout.html',context)

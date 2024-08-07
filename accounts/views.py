@@ -11,6 +11,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
+from cart.views import _cart_id,Cart ,CartItem
 
 # Create your views here.
 
@@ -68,9 +69,22 @@ def login(request):
         user = auth.authenticate(email=email,password=password)
        
         if user is not None:
+            try:
+                print(f'you are here and cart id is { _cart_id(request)}')
+                cart = Cart.objects.get(cart_id=_cart_id(request))
+
+                is_cart_item_exists = CartItem.objects.filter(cart=cart).exists()
+                if is_cart_item_exists:
+                    cart_item = CartItem.objects.filter(cart=cart)
+                    for item in cart_item:
+                        item.user = user
+                        item.save()
+
+            except:
+                pass
             auth.login(request,user)
-            # messages.success(request,'You are now logged in')
-            return redirect('home')
+            messages.success(request,'You are now logged in')
+            return redirect('dashboard')
         else:
             messages.error(request,'invlaid login credential')
             return redirect('signin')
@@ -110,3 +124,7 @@ def logout(request):
 #             messages.success(request,'Congratulations! your account is activated.')
 #             return redirect('signin')
 
+
+@login_required(login_url='login')
+def dashboard(request):
+    return render(request,'accounts/dashboard.html')
