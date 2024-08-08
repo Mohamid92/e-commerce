@@ -7,7 +7,10 @@ def counter(request):
     else : 
         try:
             cart = Cart.objects.get(cart_id=_cart_id(request))
-            cart_count = CartItem.objects.filter(cart=cart).count()
+            if request.user.is_authenticated:
+                cart_count = CartItem.objects.all().filter(user=request.user).count()
+            else:
+                cart_count = CartItem.objects.filter(cart=cart).count()
             
         except Cart.DoesNotExist:
             cart_count = 0
