@@ -231,6 +231,7 @@ def checkout(request,total=0,quantity=0,cart_items=None):
     grand_total = tax + total
     
     context = {
+        
         'total' : total,
         'quantity' : quantity,
         'cart_items' : cartitems,
