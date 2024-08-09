@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 
 def _cart_id(request):
     # Get the current session key
-    print('reaching here')
+    print('reaching herec cart id')
     cart = request.session.get('cart_id', None)
     
     # If no session key exists, create a new one
@@ -152,9 +152,6 @@ def add_cart(request, product_id):
 
         return redirect('cart')
 
-
-
-
 def remove_cart(request,product_id,cart_item_id):
     delete = request.GET.get('delete', None)
     
@@ -177,8 +174,6 @@ def remove_cart(request,product_id,cart_item_id):
     
     return redirect('cart')
     
-  
-
 def cart(request,total=0,quantity=0,cart_items=None):
     cart_id =_cart_id(request)
     print(f'start of cart function :::  {cart_id}')
@@ -208,7 +203,6 @@ def cart(request,total=0,quantity=0,cart_items=None):
 
     context = {'cart_items' : cartitems}
     return render(request, 'cart/cart.html',context)
-
 
 @login_required(login_url='signin')
 def checkout(request,total=0,quantity=0,cart_items=None):
