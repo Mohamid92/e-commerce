@@ -1,10 +1,54 @@
 from django.shortcuts import render, redirect
-from .models import  Order
-from cart.models import CartItem
+from .models import  Order ,Payment , OrderProduct
+from cart.models import CartItem,Product
 from .forms import OrderForm
 import datetime
 from django.http import HttpResponse
+import json
 def payments(request):
+    body = json.loads(request.body)
+    order = Order.objects.get(user=request.user, is_ordered=False, order_number=body['orderID'])
+    payment = Payment(
+        user = request.user,
+        payment_id = body['transID'],
+        payment_method = body['payment_method'],
+        amount_paid = order.order_total,
+        status = body['status'],
+    )
+
+    payment.save()
+    order.payment=payment
+    order.is_ordered = True
+    order.save()
+    
+    # Move the cartr items to Order Product table
+    cart_items = CartItem.objects.filter(user=request.user)
+    
+    for item in cart_items:
+        orderproduct = OrderProduct()
+        orderproduct.order_id = order.id 
+        orderproduct.payment = payment
+        orderproduct.user_id = item.user.id
+        orderproduct.product_id = item.product_id
+        orderproduct.quantity = item.quantity
+        orderproduct.product_price = item.product.price
+        orderproduct.ordered = True
+        orderproduct.save()
+        
+        cart_item = CartItem.objects.get(id=item.id)
+        product_variation = cart_item.variations.all()
+        orderproduct = OrderProduct.objects.get(id=orderproduct.id)
+        orderproduct.variation.set(product_variation)
+        orderproduct.save()
+        
+    # Reduce the quantity if the sold products
+        product = Product.objects.get(id=item.product_id)
+        product.stock -= item.quantity
+        product.save()
+    # clear cart
+        CartItem.objects.filter(user=request.user).delete()
+    
+    
     return render(request,'orders/payments.html')
     
 def place_order(request, total=0, quantity=0):
@@ -65,5 +109,5 @@ def place_order(request, total=0, quantity=0):
                 'grand_total':grand_total,
             }
             return render(request,'orders/payments.html',context)
-    else:
-            return redirect('checkout')
+    
+    return redirect('checkout')
