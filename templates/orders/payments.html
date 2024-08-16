@@ -129,6 +129,7 @@
   var url = "{% url 'payments' %}"
   const csrftoken = Cookies.get('csrftoken');
   var oderID = "{{order.order_number}}";
+  var redirect_url = "{% url 'order_complete' %}"
   payment_method = 'PayPal'
   paypal.Buttons({
     createOrder: function(data, actions) {
@@ -156,6 +157,10 @@
               payment_method: payment_method,
               status: details.status
             }),
+          })
+          .then((response) => response.json())
+          .then((data) => {
+            window.location.href = `${redirect_url}?order_number=${data.order_number}&payment_id=${data.transID}`;
           })
         }
 

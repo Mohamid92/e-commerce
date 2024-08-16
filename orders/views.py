@@ -3,7 +3,7 @@ from .models import  Order ,Payment , OrderProduct
 from cart.models import CartItem,Product
 from .forms import OrderForm
 import datetime
-from django.http import HttpResponse
+from django.http import HttpResponse,JsonResponse
 import json
 def payments(request):
     body = json.loads(request.body)
@@ -47,9 +47,15 @@ def payments(request):
         product.save()
     # clear cart
         CartItem.objects.filter(user=request.user).delete()
+
+    # send order number and transection id back to sendData method vi JS
+        data = {
+            'order_number': order.order_number,
+            'transID': payment.payment_id,
+        }
     
     
-    return render(request,'orders/payments.html')
+    return JsonResponse(data)
     
 def place_order(request, total=0, quantity=0):
     print('You are in place order GET')
@@ -111,3 +117,25 @@ def place_order(request, total=0, quantity=0):
             return render(request,'orders/payments.html',context)
     
     return redirect('checkout')
+
+def order_complete(request):
+    order_number = request.GET.get('order_number')
+    transID = request.GET.get('payment_id')
+
+    try:
+        order = Order.objects.get(order_number = order_number,is_ordered = True)
+        ordered_products = OrderProduct.objects.filter(order_id=order.id)
+        subtotal = 0
+        for i in ordered_products:
+            subtotal += i.product_price * i.quantity
+        payment = Payment.objects.get(payment_id=transID)
+        context = {
+            'order': order,
+            'ordered_products': ordered_products,
+            'order_number':order.order_number,
+            'transID': payment.payment_id,
+            'subtotal':subtotal,
+        }
+        return render(request,'orders/order_complete.html',context)
+    except (Payment.DoesNotExist,Order.DoesNotExist):
+        return redirect('home')

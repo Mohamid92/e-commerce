@@ -8,7 +8,70 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 <title>GreatKart | One of the Biggest Online Shopping Platform</title>
+<style>
+    /* Hide radio button */
+    .rate > input {
+        display: none;
+    }
+    
+    .rate {
+        display: inline-block;;
+        border: 0;
+    }
+    
+    .rate > label {
+        float: right
+    }
 
+    /* showing the stars */
+    .rate > label:before{
+        display: inline-block;
+        font-size: 1.1rem;
+        font-family: 'FontAwesome';
+        content: "\f005";
+        margin: 0;
+        padding: 0.3rem .2rem;
+        cursor: pointer;
+    }
+
+    /* Half star */
+    .rate .half::before{
+        content: "\f089";
+        position: absolute;
+        padding-right: 0;
+
+    }
+
+    /* click and hover */
+    input:checked ~ label,label:hover ~ label {
+        color: #ffb503;
+    }
+
+    /* hover higlight */
+    input:checked + label:hover, input:checked ~ label:hover,input:checked~label:hover ~ label,label:hover ~ input:checked ~ label{
+        color: #cc9000;
+    }
+
+    .rating-star i {
+        color:#ffb503;
+    }
+
+    ul.thumb {
+        margin: 0 auto;
+        padding: 0;
+        float: left;
+    }
+    ul.thumb li{
+        list-style: none;
+        margin: 10px;
+    }
+    ul.thumb li img{
+        width: 80px;
+        height: 80px;
+        border: 1px solid grey;
+    }
+   
+</style>
 <link href="{% static 'images/favicon.ico' %}" rel="shortcut icon" type="image/x-icon">
 
 <!-- jQuery -->
@@ -20,10 +83,13 @@
 
 <!-- Font awesome 5 -->
 <link href="{% static 'fonts/fontawesome/css/all.min.css' %}" type="text/css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
 
 <!-- custom style -->
 <link href="{% static 'css/ui.css' %}" rel="stylesheet" type="text/css"/>
 <link href="{% static 'css/responsive.css' %}" rel="stylesheet" media="only screen and (max-width: 1200px)" />
+
 <!-- Include js-cookie library -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.1/js.cookie.min.js"></script>
 
@@ -31,7 +97,16 @@
 <script src="{% static 'js/script.js' %}" type="text/javascript"></script>
 <script src="https://sandbox.paypal.com/sdk/js?client-id=AXnXOSddBU7SN3mphCP-SytwVMWx8Q7UWKJsiJRiwfSaHWSSpdJHo3z-rCqcJcPY7Xf0z-koaBhe4x-0"></script>
 <script type="text/javascript">
-
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.thumb a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelector('.mainImage img').src = this.href;
+                console.log(this)
+            });
+        });
+        
+    });
 /// some script
 
 // jquery ready start
@@ -41,7 +116,6 @@
 
 </head>
 <body>
-    
 
     <!-- navbar -->
     {% include 'includes/navbar.html' %}
